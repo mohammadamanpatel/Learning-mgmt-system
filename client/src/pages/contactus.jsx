@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import axiosInstance from "../config/axiosInstance";
 import { HomeLayout } from "../layouts/HomeLayout";
 
 const Contact = () => {
@@ -33,27 +34,16 @@ const Contact = () => {
         }
 
         try {
-            const response = await fetch("/contact", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(userInput),
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to submit the form");
-            }
-
-            const data = await response.json();
-            toast.promise(response, {
+            const res = axiosInstance.post("/contact", { ...userInput });
+            toast.promise(res, {
                 loading: "Submitting your message...",
-                success: data?.success ? "Form submitted successfully" : "Failed to submit the form",
+                success: "Form submitted successfully",
                 error: "Failed to submit the form",
             });
-
-            // clearing the input fields after successful submission of form
-            if (data?.success) {
+            const response = await res;
+            console.log("response",response);
+            // clearing the input fields after successfull submission of form
+            if (response?.data?.success) {
                 setUserInput({
                     name: "",
                     email: "",
@@ -61,7 +51,6 @@ const Contact = () => {
                 });
             }
         } catch (error) {
-            console.error("Error submitting form:", error);
             toast.error("Operation failed...");
         }
     };
