@@ -33,7 +33,7 @@ export const contactUs = async (req, res, next) => {
 
 export const userStats = async (req, res, next) => {
   const allUsersCount = await User.countDocuments();
-  console.log("allUsersCount in backend",allUsersCount);
+  // console.log("allUsersCount in backend",allUsersCount);
   const subscribedUsersCount = await User.countDocuments({
       'subscription.status': 'active', // subscription.status means we are going inside an object and we have to put this in quotes
     });
