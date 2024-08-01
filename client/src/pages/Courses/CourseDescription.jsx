@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { HomeLayout } from '../../layouts/HomeLayout'
 import { useSelector } from 'react-redux';
 
-export const CourseDescription = () => {
+const CourseDescription = () => {
     const navigate = useNavigate();
     const { state } = useLocation();
     console.log("state.data in course description", state.data.lectures.length);
@@ -91,4 +91,5 @@ export const CourseDescription = () => {
             </div>
         </HomeLayout>
     )
-}
+};
+export default CourseDescription;
