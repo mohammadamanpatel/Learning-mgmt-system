@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { HomeLayout } from '../layouts/HomeLayout';
 import homePageMainImage from '../Assests/Images/homePageMainImage.png';
 
-export const Home = () => {
+const Home = () => {
     return (
         <HomeLayout>
             <div className="pt-10 text-white flex flex-col md:flex-row items-center justify-center gap-10 mx-6 md:mx-16 h-[90vh]">
@@ -34,3 +34,5 @@ export const Home = () => {
         </HomeLayout>
     );
 };
+
+export default Home;
