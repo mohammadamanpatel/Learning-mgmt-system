@@ -6,7 +6,7 @@ import { HomeLayout } from "../layouts/HomeLayout";
 import { createAccount } from "../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
 
-export const SignUp = () => {
+const SignUp = () => {
   const [signupDetails, setSignupDetails] = useState({
     email: "",
     fullName: "",
@@ -167,3 +167,4 @@ export const SignUp = () => {
     </HomeLayout>
   );
 };
+export default SignUp
