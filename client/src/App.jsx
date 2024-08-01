@@ -1,53 +1,81 @@
-import logo from './logo.svg';
-import './App.css';
-import Footer from './components/Footer';
+import React, { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { AboutUs } from './pages/AboutUs'
-import Notfound from './pages/NotFoundPage'
-import { SignUp } from './pages/signupPage'
-import { Login } from './pages/LoginPage';
-import CourseList from './pages/Courses/CourseList';
-import Contact from './pages/contactus';
-import { CourseDescription } from './pages/Courses/CourseDescription';
-import RequiredAuth from './components/Auth/requiredAuth'
-import CreateCourse from './pages/Courses/CourseCreate'
-import Denied from './pages/Denied';
-import ProfilePage from './pages/profilePage'
-import EditProfile from './pages/EditProfile';
-import  CheckoutSuccess  from './pages/payment/CheckoutSuccess';
-import  CheckoutFailure  from './pages/payment/CheckoutFailure';
-import Checkout from './pages/payment/checkout';
-import  DisplayLectures  from './pages/Dashboard/showAllLectures';
-import Addlectures  from './pages/Dashboard/Addlectures';
-import AdminDashboard from './pages/Dashboard/AdminDashboard';
+import Footer from './components/Footer';
+import RequiredAuth from './components/Auth/requiredAuth';
+
+// Lazy-load routes that are not wrapped by RequiredAuth
+const Home = React.lazy(() => import('./pages/Home'));
+const AboutUs = React.lazy(() => import('./pages/AboutUs'));
+const SignUp = React.lazy(() => import('./pages/signupPage'));
+const Login = React.lazy(() => import('./pages/LoginPage'));
+const CourseList = React.lazy(() => import('./pages/Courses/CourseList'));
+const Contact = React.lazy(() => import('./pages/contactus'));
+const CourseDescription = React.lazy(() => import('./pages/Courses/CourseDescription'));
+const Denied = React.lazy(() => import('./pages/Denied'));
+const ProfilePage = React.lazy(() => import('./pages/profilePage'));
+const EditProfile = React.lazy(() => import('./pages/EditProfile'));
+const CheckoutSuccess = React.lazy(() => import('./pages/payment/CheckoutSuccess'));
+const CheckoutFailure = React.lazy(() => import('./pages/payment/CheckoutFailure'));
+const Checkout = React.lazy(() => import('./pages/payment/checkout'));
+const DisplayLectures = React.lazy(() => import('./pages/Dashboard/showAllLectures'));
+const AddLectures = React.lazy(() => import('./pages/Dashboard/Addlectures'));
+const AdminDashboard = React.lazy(() => import('./pages/Dashboard/AdminDashboard'));
+const CreateCourse = React.lazy(() => import('./pages/Courses/CourseCreate'));
+
 function App() {
   return (
     <div className="App">
-      <Routes>
-        <Route path='/' element={<Home></Home>} />
-        <Route path='/about' element={<AboutUs></AboutUs>} />
-        <Route path='*' element={<Notfound></Notfound>} />
-        <Route path='/signup' element={<SignUp></SignUp>}></Route>
-        <Route path='/login' element={<Login />} />
-        <Route path='/courses' element={<CourseList />} />
-        <Route path="/course/description" element={<CourseDescription />} />
-        <Route element={<RequiredAuth allowedRoles={["ADMIN"]} />}>
-          <Route path="/course/create" element={<CreateCourse />} />
-          <Route path='/course/AddLectures' element={<Addlectures/>}/>
-          <Route path='/Admin/Dashboard' element={<AdminDashboard/>}/>
-        </Route>
-        <Route element={<RequiredAuth allowedRoles={["ADMIN", "USER"]} />}>
-          <Route path="/user/profile" element={<ProfilePage />} />
-          <Route path="/user/EditProfile" element={<EditProfile />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/success" element={<CheckoutSuccess />} />
-          <Route path="/checkout/fail" element={<CheckoutFailure />} />
-          <Route path='/course/showLectures' element={<DisplayLectures/>}/>
-        </Route>
-        <Route path='/denied' element={<Denied />} />
-        <Route path='/contact' element={<Contact />} />
-      </Routes>
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-screen">
+          <div className="flex items-center justify-center">
+            <div className="loader"></div>
+          </div>
+          <style jsx>{`
+            .loader {
+              border: 16px solid #f3f3f3; /* Light grey */
+              border-top: 16px solid #3498db; /* Blue */
+              border-radius: 50%;
+              width: 80px;
+              height: 80px;
+              animation: spin 2s linear infinite;
+            }
+
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      }>
+        <Routes>
+          {/* Routes not protected by RequiredAuth */}
+          <Route path='/' element={<Home />} />
+          <Route path='/about' element={<AboutUs />} />
+          <Route path='/signup' element={<SignUp />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/courses' element={<CourseList />} />
+          <Route path='/course/description' element={<CourseDescription />} />
+          <Route path='/denied' element={<Denied />} />
+          <Route path='/contact' element={<Contact />} />
+
+          {/* Protected routes */}
+          <Route element={<RequiredAuth allowedRoles={["ADMIN"]} />}>
+            <Route path="/course/create" element={<CreateCourse />} />
+            <Route path='/course/addLectures' element={<AddLectures />} />
+            <Route path='/admin/dashboard' element={<AdminDashboard />} />
+          </Route>
+
+          <Route element={<RequiredAuth allowedRoles={["ADMIN", "USER"]} />}>
+            <Route path="/user/profile" element={<ProfilePage />} />
+            <Route path="/user/editProfile" element={<EditProfile />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout/success" element={<CheckoutSuccess />} />
+            <Route path="/checkout/fail" element={<CheckoutFailure />} />
+            <Route path='/course/showLectures' element={<DisplayLectures />} />
+          </Route>
+        </Routes>
+      </Suspense>
+      <Footer />
     </div>
   );
 }
