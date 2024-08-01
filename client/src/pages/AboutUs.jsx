@@ -5,7 +5,7 @@ import nelsonMandela from "../Assests/Images/nelsonMandela.png";
 import steveJobs from "../Assests/Images/steveJobs.png";
 import {HomeLayout} from "../layouts/HomeLayout";
 
-export const AboutUs = () => {
+const AboutUs = () => {
     return (
         <HomeLayout>
         <div className="flex flex-col text-white pl-4 md:pl-20 pt-10 md:pt-20">
@@ -84,3 +84,4 @@ export const AboutUs = () => {
       </HomeLayout>
       );
 }
+export default AboutUs
