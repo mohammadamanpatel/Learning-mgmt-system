@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { HomeLayout } from '../layouts/HomeLayout';
 import { useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
+import { login } from '../redux/slices/authSlice';
 
 
-const Login = () => {
+export const Login = () => {
   const [loginDetails, setLoginDetails] = useState({
     email: '',
     password: '',
@@ -30,7 +31,7 @@ const Login = () => {
     }
 
     try {
-      const actionResult = await dispatch(lo(loginDetails));
+      const actionResult = await dispatch(login(loginDetails));
       const { payload } = actionResult;
 
       if (payload) {
@@ -106,4 +107,3 @@ const Login = () => {
     </HomeLayout>
   );
 };
-export default Login
