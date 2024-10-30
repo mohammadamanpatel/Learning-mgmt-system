@@ -1,8 +1,5 @@
-Sure! Here’s a clean version of your GitHub README without any markdown symbols, including the asterisks:
-
----
-
 # My Latest Learning Management System (LMS) Project! 
+---
 
 Explore the LMS live at https://www.linkedin.com/posts/mohd-aman-patel_learningmanagementsystem-reactjs-tailwindcss-activity-7156242309951455233-Xrjv?utm_source=share&utm_medium=member_desktop
 
