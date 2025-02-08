@@ -66,8 +66,6 @@ To clone the repository and run the application locally, follow these steps:
 
 I’m excited to hear your feedback!
 
-## LearningManagementSystem #ReactJS #TailwindCSS #ChartJS #ExpressJS #MongoDB #Cloudinary #TechInnovation #WebDevelopment #EducationTech
-
 ## Directory Structure:
 
 ```
