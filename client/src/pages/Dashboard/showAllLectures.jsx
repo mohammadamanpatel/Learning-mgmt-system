@@ -12,29 +12,24 @@ function DisplayLectures() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const state = useLocation().state;
-  console.log("state.data._id", state?.data?._id);
+  const locationState = useLocation().state;
+  // Callers spread the course object straight into router state ({...course}).
+  const course = locationState?.data ?? locationState;
+  const courseId = course?._id;
   const { lectures } = useSelector((state) => state.lecture);
   const { role } = useSelector((state) => state.auth);
-  console.log("roles are", role);
   const [currentVideo, setCurrentVideo] = useState(0);
 
   useEffect(() => {
-    if (!state) {
+    if (!courseId) {
       navigate("/courses");
+      return;
     }
-    if (state._id) {
-      dispatch(getCourseLecture(state._id));
-    } else {
-      dispatch(getCourseLecture(state.data._id));
-    }
-  }, [state, navigate, dispatch]);
+    dispatch(getCourseLecture(courseId));
+  }, [courseId, navigate, dispatch]);
 
-  console.log("lectures", lectures);
-
-  function onLectureDelete(cid, lid) {
-    console.log("cid, lid", cid, lid);
-    dispatch(deleteCourseLecture({ courseId: cid, LectureId: lid }));
+  async function onLectureDelete(cid, lid) {
+    await dispatch(deleteCourseLecture({ courseId: cid, LectureId: lid }));
     dispatch(getCourseLecture(cid));
   }
 
@@ -42,7 +37,7 @@ function DisplayLectures() {
     <HomeLayout>
       <div className="flex flex-col gap-10 items-center justify-center min-h-[90vh] py-10 text-white mx-[5%]">
         <div className="text-center text-2xl font-semibold text-yellow-500">
-          Course Name : {state?.data?.title}
+          Course Name : {course?.title}
         </div>
         {lectures && lectures.length > 0 && (
           <div className="flex flex-col lg:flex-row justify-center gap-10 w-full">
@@ -71,7 +66,7 @@ function DisplayLectures() {
                 {role === "ADMIN" && (
                   <button
                     onClick={() =>
-                      navigate("/course/AddLectures", { state: { ...state } })
+                      navigate("/course/addLectures", { state: { ...course } })
                     }
                     className="btn btn-active btn-primary"
                   >
@@ -91,7 +86,7 @@ function DisplayLectures() {
                     {role === "ADMIN" && (
                       <button
                         onClick={() =>
-                          onLectureDelete(state.data._id, lecture?._id)
+                          onLectureDelete(courseId, lecture?._id)
                         }
                         className="btn btn-outline btn-warning"
                       >

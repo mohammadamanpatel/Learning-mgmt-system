@@ -36,12 +36,12 @@ function ProfilePage() {
                         <p className="font-semibold">Subscription:</p> <p>{userData?.subscription?.status === "active" ? "Active" : "Inactive"}</p>
                     </div>
                     <div className="flex flex-col md:flex-row justify-center mt-4 space-y-2 md:space-y-0 md:space-x-2">
-                        <Link
+                        {/* <Link
                             to="/changepassword"
                             className="w-full md:w-1/2 bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded-sm font-semibold py-2 text-center"
                         >
                             Change password
-                        </Link>
+                        </Link> */}
                         <Link
                             to="/user/Editprofile"
                             className="w-full md:w-1/2 bg-yellow-600 hover:bg-yellow-500 transition-all ease-in-out duration-300 rounded-sm font-semibold py-2 text-center"

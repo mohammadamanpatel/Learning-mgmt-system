@@ -32,14 +32,13 @@ export const Login = () => {
 
     try {
       const actionResult = await dispatch(login(loginDetails));
-      const { payload } = actionResult;
 
-      if (payload) {
-        toast.success('Login successful');
+      if (login.fulfilled.match(actionResult)) {
         navigate('/');
-      } else {
-        toast.error(payload?.message || 'Login failed');
+        return;
       }
+      // payload carries the server's reason via rejectWithValue
+      toast.error(actionResult.payload || 'Login failed');
     } catch (error) {
       console.log('Error during login:', error);
       toast.error('Login failed');
@@ -107,3 +106,5 @@ export const Login = () => {
     </HomeLayout>
   );
 };
+
+export default Login;

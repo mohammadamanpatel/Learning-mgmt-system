@@ -4,6 +4,7 @@ import { AiFillCloseCircle } from "react-icons/ai";
 import { FiMenu } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import Footer from "../components/Footer";
+import AskAiWidget from "../components/AskAiWidget";
 import { logout } from "../redux/slices/authSlice";
 
 export const HomeLayout = ({ children }) => {
@@ -133,6 +134,7 @@ export const HomeLayout = ({ children }) => {
       </div>
       <div className="flex-grow">{children}</div>
       <Footer />
+      <AskAiWidget />
     </div>
   );
 };

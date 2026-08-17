@@ -1,7 +1,9 @@
 import courseModel from '../Schemas/course.schema.js';
 import CourseModel from '../Schemas/course.schema.js';
 import uploadImageToCloudinary from '../utils/uploadImage.js';
+import uploadVideoToCloudinary, { MAX_VIDEO_BYTES } from '../utils/uploadVideo.js';
 import cloudinary from 'cloudinary';
+import { isValidObjectId } from 'mongoose';
 
 // Get all courses
 const getAllCourses = async function (req, res) {
@@ -24,14 +26,26 @@ const getAllCourses = async function (req, res) {
 const getCourseById = async function (req, res) {
   try {
     const CourseId = req.params.id;
+    if (!isValidObjectId(CourseId)) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid course id is required"
+      });
+    }
     const courses = await CourseModel.findById(CourseId);
+    if (!courses) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found"
+      });
+    }
     return res.status(200).json({
       success: true,
       message: "Course retrieved by Id",
       courses
     });
   } catch (error) {
-    return res.json({
+    return res.status(500).json({
       success: false,
       message: error.message
     });
@@ -154,32 +168,61 @@ const deleteCourse = async (req, res, next) => {
 const addLecturesById = async function (req, res) {
   try {
     const { title, description } = req.body;
+    console.log("title , desc of lecture while adding",title,description);
     const { id } = req.params;
     if (!title || !description) {
-      return res.json({
-        success: true,
+      return res.status(400).json({
+        success: false,
         message: "All fields are required to create the course"
+      });
+    }
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid course id is required"
+      });
+    }
+    console.log("req.files",req.files)
+    const video = req.files?.lecture;
+    if (!video) {
+      return res.status(400).json({
+        success: false,
+        message: "Lecture video is required"
+      });
+    }
+    // Fail fast and say why, rather than spending ~37s to get a 413 back.
+    if (video.size > MAX_VIDEO_BYTES) {
+      console.log("size is large")
+      return res.status(413).json({
+        success: false,
+        message: `Video is ${(video.size / 1024 / 1024).toFixed(1)} MB. The limit is ${MAX_VIDEO_BYTES / 1024 / 1024} MB.`
       });
     }
     const courses = await courseModel.findById(id);
     if (!courses) {
-      return res.status(400).json({
+      return res.status(404).json({
         success: false,
         message: "Course not found"
       });
     }
-    const lectureData = {
+    let result;
+    try {
+      result = await uploadVideoToCloudinary(video, process.env.FOLDER);
+    } catch (uploadError) {
+      console.error("Lecture video upload failed:", uploadError);
+      return res.status(uploadError?.http_code === 413 ? 413 : 502).json({
+        success: false,
+        message: uploadError?.message || "Lecture video could not be uploaded"
+      });
+    }
+    courses.lectures.push({
       title,
       description,
-      lecture: {}
-    };
-    const video = req.files.lecture;
-    const result = await uploadImageToCloudinary(video, process.env.FOLDER, 500, 500);
-    if (result) {
-      lectureData.lecture.public_id = result.public_id;
-      lectureData.lecture.secure_url = result.secure_url;
-    }
-    courses.lectures.push(lectureData);
+      lecture: {
+        public_id: result.public_id,
+        secure_url: result.secure_url
+      }
+    });
     courses.noOfLectures = courses.lectures.length;
     await courses.save();
     return res.status(200).json({
@@ -188,7 +231,8 @@ const addLecturesById = async function (req, res) {
       courses
     });
   } catch (error) {
-    return res.json({
+    console.error("addLecturesById failed:", error);
+    return res.status(500).json({
       success: false,
       message: error.message
     });

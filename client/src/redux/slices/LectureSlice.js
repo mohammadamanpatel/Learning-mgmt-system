@@ -43,27 +43,32 @@ export const deleteCourseLecture = createAsyncThunk("/course/lecture/delete", as
 
 
 
-export const addCourseLecture = createAsyncThunk("/course/lecture/add", async (data) => {
-    try {
-        console.log("data of admin details for adding lectures",data);
-        const formData = new FormData();
-        Object.entries(data).forEach(([key,value]) => {
-            console.log("key and value",key, value);
-            formData.append(key, value);
-        });
-        console.log("formData",formData);
-        const response = axiosInstance.post(`/courses/CourseId/${data.id}`, formData);
-        toast.promise(response, {
-            loading: "adding course lectures",
-            success: "added course lectures",
-            error: "Failed to add the lectures"
-        });
-        console.log("response while adding lectures",await response)
-        return (await response).data;
-    } catch(error) {
-        toast.error(error?.response?.data?.message);
+export const addCourseLecture = createAsyncThunk(
+    "/course/lecture/add",
+    async (data, { rejectWithValue }) => {
+        try {
+            const formData = new FormData();
+            formData.append("title", data.title);
+            formData.append("description", data.description);
+            formData.append("lecture", data.lecture);
+
+            const request = axiosInstance.post(`/courses/CourseId/${data.id}`, formData);
+            await toast.promise(request, {
+                loading: "adding course lectures",
+                success: (res) => res?.data?.message || "Added course lecture",
+                error: (err) => err?.response?.data?.message || "Failed to add the lecture"
+            });
+            const response = await request;
+            return response.data;
+        } catch(error) {
+            // Must reject: returning undefined here resolves the thunk, which the
+            // caller reads as success.
+            return rejectWithValue(
+                error?.response?.data?.message || error.message || "Failed to add the lecture"
+            );
+        }
     }
-});
+);
 
 const lectureSlice = createSlice({
     name: "lecture",
@@ -71,12 +76,11 @@ const lectureSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(getCourseLecture.fulfilled, (state, action) => {
-            console.log("action while getting course",action);
-            state.lectures = action?.payload?.lectures;
+            state.lectures = action?.payload?.lectures ?? [];
         })
         builder.addCase(addCourseLecture.fulfilled, (state, action) => {
-            console.log("action while creating lecture",action);
-            state.lectures = action?.payload?.getCourseDetailsById?.course?.lectures;
+            // the controller responds with { success, message, courses }
+            state.lectures = action?.payload?.courses?.lectures ?? state.lectures;
         })
     }
 })

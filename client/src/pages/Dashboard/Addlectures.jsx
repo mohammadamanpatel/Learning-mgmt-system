@@ -7,14 +7,18 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { HomeLayout } from "../../layouts/HomeLayout";
 import { addCourseLecture } from "../../redux/slices/LectureSlice";
 
+// Matches MAX_VIDEO_BYTES in server/utils/uploadVideo.js
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+
 function AddLecture() {
-  const courseDetails = useLocation().state;
-  console.log("course details are ", courseDetails);
-//   console.log("courseDetails._id in addLetures", courseDetails?.courseId);
+  const locationState = useLocation().state;
+  // Callers spread the course object straight into router state ({...course}),
+  // so the course lives at the top level, not under `.data`.
+  const courseDetails = locationState?.data ?? locationState;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [userInput, setUserInput] = useState({
-    id: courseDetails?.data?._id,
+    id: courseDetails?._id,
     lecture: undefined,
     title: "",
     description: "",
@@ -31,8 +35,16 @@ function AddLecture() {
 
   function handleVideo(e) {
     const video = e.target.files[0];
+    if (!video) return;
+    if (video.size > MAX_VIDEO_BYTES) {
+      toast.error(
+        `Video is ${(video.size / 1024 / 1024).toFixed(1)} MB. The limit is ${
+          MAX_VIDEO_BYTES / 1024 / 1024
+        } MB.`
+      );
+      return;
+    }
     const src = window.URL.createObjectURL(video);
-    console.log("src", src, video);
     setUserInput({
       ...userInput,
       lecture: video,
@@ -46,15 +58,15 @@ function AddLecture() {
       toast.error("All fields are mandatory");
       return;
     }
-    console.log("userDetails", userInput);
-    console.log("userDetails title", userInput.title);
-    console.log("userDetails description", userInput.description);
-    console.log("userDetails lecture", userInput.lecture);
+    if (!userInput.id) {
+      toast.error("Missing course, please reopen this page from the course");
+      return;
+    }
     const response = await dispatch(addCourseLecture(userInput));
     if (response?.payload?.success) {
       navigate(-1);
       setUserInput({
-        id: courseDetails?.data?._id,
+        id: courseDetails?._id,
         lecture: undefined,
         title: "",
         description: "",
@@ -64,7 +76,7 @@ function AddLecture() {
   }
 
   useEffect(() => {
-    if (!courseDetails) navigate("/course");
+    if (!courseDetails) navigate("/courses");
   }, [courseDetails, navigate]);
 
   return (
