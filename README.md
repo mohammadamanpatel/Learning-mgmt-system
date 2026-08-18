@@ -1,11 +1,10 @@
-```markdown
 # Learning Management System (LMS)
 
 ---
 
 ## Live Deployment
 
-**URL:** https://learning-mgmt-system.onrender.com
+**URL:** [https://learning-mgmt-system.onrender.com](https://learning-mgmt-system.onrender.com)
 
 ---
 
@@ -16,28 +15,29 @@
 **Backend:** Node.js, Express 4, MongoDB (Mongoose 7), Cloudinary, Razorpay, Nodemailer, JWT cookies, express-fileupload
 
 **AI (Ask AI):** Google Gemini API (`@google/generative-ai`)
-- Embeddings: `gemini-embedding-001` (768 dimensions, free tier)
-- LLM chat: `gemini-3.6-flash` (free tier)
+
+* Embeddings: `gemini-embedding-001` (768 dimensions, free tier)
+* LLM chat: `gemini-3.6-flash` (free tier)
 
 ---
 
 ## Features
 
-- **Auth** — Signup, Login, JWT cookies, role-based access (ADMIN/USER)
-- **Courses** — Create, list, view details with thumbnails (Cloudinary)
-- **Lectures** — Add, view, delete lectures with video upload (chunked)
-- **Payments** — Razorpay subscription integration
-- **Admin Dashboard** — Chart.js analytics
-- **Ask AI** — Floating chat widget, natural language course recommendations via Gemini AI
-- **Contact Form** — Nodemailer (currently broken — invalid app password)
+* **Auth** — Signup, Login, JWT cookies, role-based access (ADMIN/USER)
+* **Courses** — Create, list, view details with thumbnails (Cloudinary)
+* **Lectures** — Add, view, delete lectures with video upload (chunked)
+* **Payments** — Razorpay subscription integration
+* **Admin Dashboard** — Chart.js analytics
+* **Ask AI** — Floating chat widget, natural language course recommendations via Gemini AI
+* **Contact Form** — Nodemailer (currently broken — invalid app password)
 
 ---
 
 ## Directory Structure
 
-```
+```text
 Learning-mgmt-system/
-├── .env                          # ALL secrets (gitignored)
+├── .env
 ├── package.json
 ├── client/
 │   ├── package.json
@@ -118,7 +118,7 @@ Learning-mgmt-system/
 
 ## Environment Variables (.env) — gitignored, never commit
 
-```
+```env
 API_KEY=...
 API_SECRET=...
 CLOUD_NAME=...
@@ -143,7 +143,7 @@ GEMINI_API_KEY=...
 
 ### How it works
 
-```
+```text
 User types: "I want to learn React"
   → embedText(query) → 768 floats (gemini-embedding-001)
   → cosine similarity against all course embeddings
@@ -154,43 +154,33 @@ User types: "I want to learn React"
 ```
 
 ### API Endpoints
-- **`POST /api/v1/ask-ai`** — Body: `{ "query": "..." }` → `{ success, aiResponse, courses }`
-- **`POST /api/v1/sync-embeddings`** — Admin only. Syncs course embeddings.
 
-### Test scripts (run directly, no server needed)
+* **`POST /api/v1/ask-ai`** — Body: `{ "query": "..." }` → `{ success, aiResponse, courses }`
+* **`POST /api/v1/sync-embeddings`** — Admin only. Syncs course embeddings.
+
+### Test Scripts
+
+Run directly without starting the server:
+
 ```bash
-node server/scripts/seedCourses.js     # Seed 8 courses into MongoDB
-node server/scripts/testAskAi.js       # Embed + run 6 test queries
+node server/scripts/seedCourses.js
+node server/scripts/testAskAi.js
 ```
 
 ### Files
 
-| File | Purpose |
-|---|---|
-| `server/Schemas/courseEmbedding.schema.js` | Separate collection for course embeddings |
-| `server/utils/geminiClient.js` | Gemini SDK — embedText() + generateText() |
-| `server/utils/recommendCourses.js` | Cosine similarity engine, top 5 matches |
-| `server/controllers/askAiController.js` | POST /api/v1/ask-ai — full pipeline |
-| `server/controllers/syncEmbeddingsController.js` | POST /api/v1/sync-embeddings |
-| `server/routes/askAiRoutes.js` | Routes for ask-ai + sync-embeddings |
-| `server/scripts/seedCourses.js` | Seeds courses into MongoDB (idempotent) |
-| `server/scripts/testAskAi.js` | Standalone AI feature test |
-| `client/src/components/AskAiWidget.jsx` | Floating chat widget (FAB + panel + cards) |
-| `client/src/layouts/HomeLayout.jsx` | Renders AskAiWidget on every page |
-
----
-
-## Bugs Fixed
-
-1. `server/utils/mailSender.js` — error swallowing (added throw)
-2. `server/controllers/Course.Controller.js` — video upload: ObjectId validation, size check, chunked upload
-3. `server/app.js` — file size limits (150 MB) with abort handler
-4. `server/utils/uploadVideo.js` — new file, chunked upload via upload_large()
-5. `client/src/pages/Dashboard/Addlectures.jsx` — locationState fix, video size check, redirect fix
-6. `client/src/pages/Dashboard/showAllLectures.jsx` — locationState fix, courseId guard
-7. `client/src/pages/LoginPage.jsx` — login fulfilled match, default export
-8. `client/src/pages/profilePage.jsx` — broken change password link removed
-9. `server/utils/geminiClient.js` — model updated gemini-2.5-flash → gemini-3.6-flash
+| File                                             | Purpose                                    |
+| ------------------------------------------------ | ------------------------------------------ |
+| `server/Schemas/courseEmbedding.schema.js`       | Separate collection for course embeddings  |
+| `server/utils/geminiClient.js`                   | Gemini SDK — embedText() + generateText()  |
+| `server/utils/recommendCourses.js`               | Cosine similarity engine, top 5 matches    |
+| `server/controllers/askAiController.js`          | POST /api/v1/ask-ai — full pipeline        |
+| `server/controllers/syncEmbeddingsController.js` | POST /api/v1/sync-embeddings               |
+| `server/routes/askAiRoutes.js`                   | Routes for ask-ai + sync-embeddings        |
+| `server/scripts/seedCourses.js`                  | Seeds courses into MongoDB (idempotent)    |
+| `server/scripts/testAskAi.js`                    | Standalone AI feature test                 |
+| `client/src/components/AskAiWidget.jsx`          | Floating chat widget (FAB + panel + cards) |
+| `client/src/layouts/HomeLayout.jsx`              | Renders AskAiWidget on every page          |
 
 ---
 
@@ -206,5 +196,3 @@ npm run dev
 
 # Visit http://localhost:5173
 ```
-
----
